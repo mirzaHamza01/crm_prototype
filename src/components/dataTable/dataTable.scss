@@ -1,0 +1,59 @@
+.data-table-box-container {
+  .MuiTableContainer-root {
+    border-radius: 4px;
+  }
+  .table-data-head-container {
+    .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active {
+      .MuiSvgIcon-root {
+        color: white;
+      }
+      color: white;
+      text-decoration: underline;
+    }
+    .MuiButtonBase-root:hover {
+      .MuiSvgIcon-root {
+        color: white;
+      }
+      color: white;
+      text-decoration: underline;
+    }
+    .table-data-head-checkbox {
+      .MuiCheckbox-root {
+        color: #196579;
+      }
+      .MuiTypography-root {
+        align-items: center;
+        display: flex;
+      }
+      display: flex;
+    }
+  }
+  .accounts-table-data-body {
+    .data-link {
+      text-decoration: none;
+      font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+      font-weight: 400;
+      font-size: 0.875rem;
+      line-height: 1.43;
+      letter-spacing: 0.01071em;
+      vertical-align: inherit;
+      text-align: right;
+      padding: 16px;
+      color: rgba(0, 0, 0, 0.87);
+      -webkit-flex-direction: row-reverse;
+      -ms-flex-direction: row-reverse;
+      flex-direction: row-reverse;
+    }
+  
+    .MuiCheckbox-root {
+      color: #196579;
+    }
+    .MuiTableRow-root:hover {
+      background: #196579;
+      .MuiTableCell-root,
+      .MuiCheckbox-root ,  .data-link{
+        color: white;
+      }
+    }
+  }
+}

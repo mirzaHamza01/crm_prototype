@@ -1,0 +1,31 @@
+.accounts-data-container {
+  justify-content: center;
+  display: flex;
+  .accounts-data-box {
+    width: 80%;
+    margin-top: 50px;
+    #tableTitle {
+      display: block;
+      font-size: 26px;
+      font-weight: 300;
+      color: #534d64;
+      margin: 0 0 12px 0;
+      float: left;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .MuiToolbar-root {
+      padding-left: 0%;
+    }
+    .ccounts-data-title {
+      display: block;
+      font-size: 26px;
+      font-weight: 300;
+      color: #534d64;
+      margin: 0 0 12px 0;
+      float: left;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+  }
+}
