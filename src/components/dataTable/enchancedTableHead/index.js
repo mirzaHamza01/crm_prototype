@@ -6,7 +6,9 @@ import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import { TablePagination } from "@mui/material";
-
+import IconButton from "@mui/material/IconButton";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 function EnhancedTableHead(props) {
   const {
     onSelectAllClick,
@@ -22,7 +24,11 @@ function EnhancedTableHead(props) {
     handleChangePage,
     handleChangeRowsPerPage,
     page,
+    rows,
     totalAccounts,
+    handleOpen,
+    isFilter,
+    handleClearFilter,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -61,29 +67,45 @@ function EnhancedTableHead(props) {
       </StyledTableRow>
       <StyledTableRow style={{ background: "#1965794a" }}>
         <div className="table-data-head-checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
-          {numSelected > 0 && (
-            <Typography
-              sx={{ flex: "1 1 100%" }}
-              color="inherit"
-              variant="subtitle1"
-              component="div"
+          <div className="d-flex">
+            {" "}
+            <Checkbox
+              color="primary"
+              indeterminate={numSelected > 0 && numSelected < rowCount}
+              checked={rowCount > 0 && numSelected === rowCount}
+              onChange={onSelectAllClick}
+              inputProps={{
+                "aria-label": "select all desserts",
+              }}
+            />
+            {numSelected > 0 && (
+              <Typography
+                sx={{ flex: "1 1 100%" }}
+                color="inherit"
+                variant="subtitle1"
+                component="div"
+              >
+                {numSelected} selected
+              </Typography>
+            )}
+          </div>
+          <IconButton aria-label="filterIcon" onClick={handleOpen}>
+            <FilterAltIcon color="#fff" />
+          </IconButton>
+
+          {isFilter && (
+            <IconButton
+              aria-label="filterIcon"
+              className="pl-3"
+              onClick={handleClearFilter}
             >
-              {numSelected} selected
-            </Typography>
+              <FilterAltOffIcon color="#fff" />
+            </IconButton>
           )}
         </div>
         <TablePagination
           rowsPerPageOptions={[20]}
-          count={totalAccounts.length}
+          count={isFilter ? rows.length : totalAccounts.length}
           className="mb-0"
           rowsPerPage={rowsPerPage}
           page={page}

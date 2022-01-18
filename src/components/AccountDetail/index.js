@@ -49,9 +49,10 @@ function a11yProps(index) {
 export default function AccountDetail(props) {
   const [value, setValue] = React.useState(0);
   const { state } = useLocation();
-  const { accountData, accIndex, totalIndex, accountIds } = state;
+  const { accountData, accIndex, totalIndex, accountIds, accessToken } = state;
   const [load, setLoad] = React.useState(false);
   const [curIndex, setCurIndex] = useState(accIndex);
+  const [token, setToken] = useState(accessToken);
   const [currentAccData, setCurrentAccData] = React.useState(accountData);
   const navigate = useNavigate();
 
@@ -64,7 +65,7 @@ export default function AccountDetail(props) {
   async function handleIncrement() {
     setLoad(true);
     let count = curIndex + 1;
-    await restApiRequest(true, accountIds[count]).then((res) => {
+    await restApiRequest(token, true, accountIds[count]).then((res) => {
       setCurrentAccData(res);
       setCurIndex(count);
       navigate(`/Accounts/${accountIds[count]}`, {
@@ -83,7 +84,7 @@ export default function AccountDetail(props) {
   async function handleDecrement() {
     setLoad(true);
     let count = curIndex - 1;
-    await restApiRequest(true, accountIds[count]).then((res) => {
+    await restApiRequest(token, true, accountIds[count]).then((res) => {
       setCurrentAccData(res);
       setCurIndex(count);
       navigate(`/Accounts/${accountIds[count]}`, {

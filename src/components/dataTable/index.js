@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,20 +9,43 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { styled } from "@mui/material/styles";
-import { restApiGetAccounts, restApiRequest } from "../../APi";
+import {
+  restApiGetAccounts,
+  restApiRequest,
+  restApiGetAccessToken,
+} from "../../APi";
 import EnhancedTableHead from "./enchancedTableHead";
 import LoadingComponent from "../../loadingComponent";
 import { useNavigate } from "react-router-dom";
+import FilterAccounts from "./filterAccounts";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 export default function DataTable() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("");
   const [selected, setSelected] = React.useState([]);
   const [accountData, setAccountData] = React.useState();
+  const [filterAccountData, setFilterAccountData] = useState();
   const [page, setPage] = React.useState(0);
   const [load, setLoad] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(3);
   const [totalAccounts, setTotalAccounts] = useState([]);
+  const [value, setValue] = useState("");
+  const [open, setOpen] = React.useState(false);
+  const [isFilter, setIsFilter] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const [accessToken, setAccessToken] = useState("");
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -73,15 +96,22 @@ export default function DataTable() {
   }
   React.useEffect(() => {
     setLoad(true);
-    restApiGetAccounts().then((res) => {
-      setTotalAccounts(res);
-    });
-    restApiRequest(false).then((res) => {
-      setAccountData(res);
-      setLoad(false);
+    restApiGetAccessToken().then((token) => {
+      setAccessToken(token);
+      restApiGetAccounts(token).then((res) => {
+        setTotalAccounts(res);
+      });
+      restApiRequest(token, false).then((res) => {
+        setAccountData(res);
+        setLoad(false);
+      });
     });
   }, []);
 
+  function handleClearFilter() {
+    setValue("");
+    setIsFilter(false);
+  }
   let accountIds = [];
   totalAccounts.map((acc, i) => {
     accountIds.push(acc.id);
@@ -126,17 +156,27 @@ export default function DataTable() {
     },
   ];
 
-  const row =
-    accountData &&
-    accountData.map((acc, i) => {
-      let objCell = {};
-      headCells.map((cell, c) => {
-        Object.keys(acc.attributes).forEach((k, j) => {
-          cell.id == k && (objCell[k] = acc.attributes[k]);
+  const row = isFilter
+    ? filterAccountData &&
+      filterAccountData.map((acc, i) => {
+        let objCell = {};
+        headCells.map((cell, c) => {
+          Object.keys(acc.attributes).forEach((k, j) => {
+            cell.id == k && (objCell[k] = acc.attributes[k]);
+          });
         });
+        return objCell;
+      })
+    : accountData &&
+      accountData.map((acc, i) => {
+        let objCell = {};
+        headCells.map((cell, c) => {
+          Object.keys(acc.attributes).forEach((k, j) => {
+            cell.id == k && (objCell[k] = acc.attributes[k]);
+          });
+        });
+        return objCell;
       });
-      return objCell;
-    });
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -174,7 +214,7 @@ export default function DataTable() {
   };
 
   const handleChangePage = async (event, newPage) => {
-    await restApiRequest(false, null, newPage + 1).then((res) => {
+    await restApiRequest(accessToken, false, null, newPage + 1).then((res) => {
       setAccountData(res);
       setPage(newPage);
     });
@@ -186,21 +226,17 @@ export default function DataTable() {
   };
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  // const emptyRows =
-  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - row.length) : 0;
-
   const navigate = useNavigate();
 
   function handleNextPage(id, data, total) {
     const index = accountIds.findIndex((x) => x == id);
-    console.log(index);
     navigate(`Accounts/${id}`, {
       state: {
         accountData: data,
         accountIds: accountIds,
         accIndex: index,
         totalIndex: total,
+        accessToken: accessToken,
       },
     });
   }
@@ -231,6 +267,9 @@ export default function DataTable() {
               headCells={headCells}
               handleChangeRowsPerPage={handleChangeRowsPerPage}
               handleChangePage={handleChangePage}
+              handleOpen={handleOpen}
+              isFilter={isFilter}
+              handleClearFilter={handleClearFilter}
             />
             <TableBody className="accounts-table-data-body">
               {stableSort(row, getComparator(order, orderBy)).map(
@@ -283,7 +322,13 @@ export default function DataTable() {
                                   totalAccounts.length
                                 )
                               }
-                              style={{ cursor: "pointer" }}
+                              style={
+                                val[0] === "name" || val[0] === "phone_office"
+                                  ? {
+                                      cursor: "pointer",
+                                    }
+                                  : null
+                              }
                             >
                               {val[0] === "date_entered"
                                 ? new Date(val[1]).toLocaleDateString()
@@ -292,83 +337,6 @@ export default function DataTable() {
                           </StyledTableCell>
                         );
                       })}
-                      {/* <StyledTableCell
-                        component="th"
-                        id={labelId}
-                        colSpan="2"
-                        scope="row"
-                        style={{ whiteSpace: "nowrap" }}
-                        padding="none"
-                      >
-                        <Checkbox
-                          color="primary"
-                          onClick={(event) => handleClick(event, row.name)}
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />{" "}
-                        <span
-                          onClick={() =>
-                            handleNextPage(
-                              accountData[index].id,
-                              accountData[index],
-                              index,
-                              totalAccounts.length
-                            )
-                          }
-                          style={{ cursor: "pointer" }}
-                        >
-                          {row.name}
-                        </span>
-                      </StyledTableCell>
-                      <StyledTableCell
-                        colSpan="2"
-                        style={{ textAlign: "center" }}
-                        align="right"
-                      >
-                        {row.billing_address_country}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        colSpan="2"
-                        style={{ textAlign: "center" }}
-                        align="right"
-                      >
-                        <span
-                          onClick={() =>
-                            handleNextPage(
-                              accountData[index].id,
-                              accountData[index],
-                              index,
-                              totalAccounts.length
-                            )
-                          }
-                          style={{ cursor: "pointer" }}
-                        >
-                          {row.phone_office}
-                        </span>
-                      </StyledTableCell>
-                      <StyledTableCell
-                        colSpan="2"
-                        style={{ textAlign: "center" }}
-                        align="right"
-                      >
-                        {row.assigned_user_name}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        colSpan="2"
-                        style={{ textAlign: "center" }}
-                        align="right"
-                      >
-                        {row.email}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        colSpan="2"
-                        style={{ textAlign: "center" }}
-                        align="right"
-                      >
-                        {new Date(row.date_entered).toLocaleDateString()}
-                      </StyledTableCell> */}
                     </StyledTableRow>
                   );
                 }
@@ -380,7 +348,7 @@ export default function DataTable() {
           >
             <TablePagination
               rowsPerPageOptions={[20]}
-              count={totalAccounts.length}
+              count={isFilter ? row.length : totalAccounts.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -389,6 +357,18 @@ export default function DataTable() {
           </StyledTableRow>
         </TableContainer>
       </Paper>
+      <FilterAccounts
+        accessToken={accessToken}
+        setFilterAccountData={setFilterAccountData}
+        open={open}
+        setOpen={setOpen}
+        setIsFilter={setIsFilter}
+        handleOpen={handleOpen}
+        setValue={setValue}
+        value={value}
+        setSelected={setSelected}
+        setPage={setPage}
+      />
     </Box>
   );
 }

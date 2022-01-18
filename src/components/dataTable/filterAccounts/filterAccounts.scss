@@ -1,0 +1,51 @@
+.accounts-filter-dialog {
+  .css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+    min-width: 40%;
+  }
+  .css-1t4vnk2-MuiDialogContent-root {
+    padding: 20px 30px !important;
+    .filter-label {
+      color: #534d64;
+    }
+    .filter-text-field {
+      width: 90%;
+      .css-1d3z3hw-MuiOutlinedInput-notchedOutline {
+        border-color: #196579 !important;
+      }
+    }
+  }
+  .css-hlj6pa-MuiDialogActions-root {
+    padding: 20px 30px !important;
+    justify-content: space-between;
+    .filter-action-search-btn {
+      font-size: 13px;
+      font-weight: 500;
+      background: #196579;
+      color: #f5f5f5;
+      cursor: pointer;
+      padding: 0 20px 0 20px;
+      margin: 0 0 0 0;
+      border: none;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      line-height: 32px;
+      height: 32px;
+      text-transform: uppercase;
+    }
+    .filter-action-cancel-btn {
+      font-size: 13px;
+      font-weight: 500;
+      background: #ff0000ab;
+      color: #f5f5f5;
+      cursor: pointer;
+      padding: 0 20px 0 20px;
+      margin: 0 0 0 0;
+      border: none;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      line-height: 32px;
+      height: 32px;
+      text-transform: uppercase;
+    }
+  }
+}

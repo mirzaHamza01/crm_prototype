@@ -30,8 +30,20 @@
       .MuiTypography-root {
         align-items: center;
         display: flex;
+        margin-right: 20px;
       }
       display: flex;
+      .css-78trlr-MuiButtonBase-root-MuiIconButton-root {
+        padding: 0px 4px;
+        margin-top: 4px;
+        margin-right: 10px;
+        background-color: #196579a3;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        .css-i4bv87-MuiSvgIcon-root {
+          color: white;
+        }
+      }
     }
   }
   .accounts-table-data-body {
