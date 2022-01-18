@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -9,62 +9,10 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { styled } from "@mui/material/styles";
-import restApiRequest from "../../APi";
-import EnhancedTableToolbar from "./enchancedToolBar";
+import { restApiGetAccounts, restApiRequest } from "../../APi";
 import EnhancedTableHead from "./enchancedTableHead";
-import { TableHead, Typography } from "@mui/material";
 import LoadingComponent from "../../loadingComponent";
 import { useNavigate } from "react-router-dom";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#196579",
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
 
 export default function DataTable() {
   const [order, setOrder] = React.useState("asc");
@@ -73,15 +21,71 @@ export default function DataTable() {
   const [accountData, setAccountData] = React.useState();
   const [page, setPage] = React.useState(0);
   const [load, setLoad] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(3);
+  const [totalAccounts, setTotalAccounts] = useState([]);
 
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: "#196579",
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 14,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(order, orderBy) {
+    return order === "desc"
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  function stableSort(array, comparator) {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) {
+        return order;
+      }
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  }
   React.useEffect(() => {
     setLoad(true);
-    restApiRequest().then((res) => {
+    restApiGetAccounts().then((res) => {
+      setTotalAccounts(res);
+    });
+    restApiRequest(false).then((res) => {
       setAccountData(res);
       setLoad(false);
     });
   }, []);
+
+  let accountIds = [];
+  totalAccounts.map((acc, i) => {
+    accountIds.push(acc.id);
+  });
 
   const headCells = [
     {
@@ -122,17 +126,13 @@ export default function DataTable() {
     },
   ];
 
-  const accountIds = [];
   const row =
     accountData &&
-    accountData.entry_list.map((acc, i) => {
+    accountData.map((acc, i) => {
       let objCell = {};
-      accountIds.push(acc.id)
       headCells.map((cell, c) => {
-        Object.keys(acc.name_value_list).forEach((k, j) => {
-          cell.id == acc.name_value_list[k].name &&
-            (objCell[acc.name_value_list[k].name] =
-              acc.name_value_list[k].value);
+        Object.keys(acc.attributes).forEach((k, j) => {
+          cell.id == k && (objCell[k] = acc.attributes[k]);
         });
       });
       return objCell;
@@ -173,29 +173,33 @@ export default function DataTable() {
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = async (event, newPage) => {
+    await restApiRequest(false, null, newPage + 1).then((res) => {
+      setAccountData(res);
+      setPage(newPage);
+    });
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - row.length) : 0;
+  // const emptyRows =
+  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - row.length) : 0;
 
   const navigate = useNavigate();
 
-  function handleNextPage(id, data, i, total) {
+  function handleNextPage(id, data, total) {
+    const index = accountIds.findIndex((x) => x == id);
+    console.log(index);
     navigate(`Accounts/${id}`, {
       state: {
-        accountData: accountData.entry_list,
+        accountData: data,
         accountIds: accountIds,
-        accIndex: i,
+        accIndex: index,
         totalIndex: total,
       },
     });
@@ -217,10 +221,11 @@ export default function DataTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={accountData && accountData.result_count}
+              rowCount={accountData && accountData.length}
               StyledTableRow={StyledTableRow}
               StyledTableCell={StyledTableCell}
               rows={accountData && row}
+              totalAccounts={totalAccounts}
               rowsPerPage={rowsPerPage}
               page={page}
               headCells={headCells}
@@ -228,104 +233,145 @@ export default function DataTable() {
               handleChangePage={handleChangePage}
             />
             <TableBody className="accounts-table-data-body">
-              {accountData &&
-                stableSort(row, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    const isItemSelected = isSelected(row.name);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-                    return (
-                      <StyledTableRow
-                        hover
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={index}
-                        selected={isItemSelected}
+              {stableSort(row, getComparator(order, orderBy)).map(
+                (row, index) => {
+                  const isItemSelected = isSelected(row.name);
+                  const labelId = `enhanced-table-checkbox-${index}`;
+                  return (
+                    <StyledTableRow
+                      hover
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={index}
+                      selected={isItemSelected}
+                    >
+                      {Object.entries(row).map((val, i) => {
+                        return (
+                          <StyledTableCell
+                            style={
+                              val[0] === "name"
+                                ? { whiteSpace: "nowrap" }
+                                : { textAlign: "center" }
+                            }
+                            align={val[0] !== "name" ? "right" : "left"}
+                            component="th"
+                            id={labelId}
+                            colSpan="2"
+                            scope="row"
+                            padding={val[0] === "name" && "none"}
+                          >
+                            {val[0] === "name" && (
+                              <Checkbox
+                                color="primary"
+                                onClick={(event) =>
+                                  handleClick(event, row.name)
+                                }
+                                checked={isItemSelected}
+                                inputProps={{
+                                  "aria-labelledby": labelId,
+                                }}
+                              />
+                            )}
+                            <span
+                              onClick={() =>
+                                (val[0] === "name" ||
+                                  val[0] === "phone_office") &&
+                                handleNextPage(
+                                  accountData[index].id,
+                                  accountData[index],
+                                  totalAccounts.length
+                                )
+                              }
+                              style={{ cursor: "pointer" }}
+                            >
+                              {val[0] === "date_entered"
+                                ? new Date(val[1]).toLocaleDateString()
+                                : val[1]}
+                            </span>
+                          </StyledTableCell>
+                        );
+                      })}
+                      {/* <StyledTableCell
+                        component="th"
+                        id={labelId}
+                        colSpan="2"
+                        scope="row"
+                        style={{ whiteSpace: "nowrap" }}
+                        padding="none"
                       >
-                        <StyledTableCell
-                          component="th"
-                          id={labelId}
-                          colSpan="2"
-                          scope="row"
-                          padding="none"
+                        <Checkbox
+                          color="primary"
+                          onClick={(event) => handleClick(event, row.name)}
+                          checked={isItemSelected}
+                          inputProps={{
+                            "aria-labelledby": labelId,
+                          }}
+                        />{" "}
+                        <span
+                          onClick={() =>
+                            handleNextPage(
+                              accountData[index].id,
+                              accountData[index],
+                              index,
+                              totalAccounts.length
+                            )
+                          }
+                          style={{ cursor: "pointer" }}
                         >
-                          <Checkbox
-                            color="primary"
-                            onClick={(event) => handleClick(event, row.name)}
-                            checked={isItemSelected}
-                            inputProps={{
-                              "aria-labelledby": labelId,
-                            }}
-                          />{" "}
-                          <span
-                            onClick={() =>
-                              handleNextPage(
-                                accountData.entry_list[index].id,
-                                accountData.entry_list[index],
-                                index,
-                                accountData.result_count
-                              )
-                            }
-                            style={{ cursor: "pointer" }}
-                          >
-                            {row.name}
-                          </span>
-                        </StyledTableCell>
-                        <StyledTableCell
-                          colSpan="2"
-                          style={{ "text-align": "center" }}
-                          align="right"
+                          {row.name}
+                        </span>
+                      </StyledTableCell>
+                      <StyledTableCell
+                        colSpan="2"
+                        style={{ textAlign: "center" }}
+                        align="right"
+                      >
+                        {row.billing_address_country}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        colSpan="2"
+                        style={{ textAlign: "center" }}
+                        align="right"
+                      >
+                        <span
+                          onClick={() =>
+                            handleNextPage(
+                              accountData[index].id,
+                              accountData[index],
+                              index,
+                              totalAccounts.length
+                            )
+                          }
+                          style={{ cursor: "pointer" }}
                         >
-                          {row.billing_address_country}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          colSpan="2"
-                          style={{ "text-align": "center" }}
-                          align="right"
-                        >
-                          <span
-                            onClick={() =>
-                              handleNextPage(
-                                accountData.entry_list[index].id,
-                                accountData.entry_list[index],
-                                index,
-                                accountData.result_count
-                              )
-                            }
-                            style={{ cursor: "pointer" }}
-                          >
-                            {row.phone_office}
-                          </span>
-                        </StyledTableCell>
-                        <StyledTableCell
-                          colSpan="2"
-                          style={{ "text-align": "center" }}
-                          align="right"
-                        >
-                          {row.assigned_user_name}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          colSpan="2"
-                          style={{ "text-align": "center" }}
-                          align="right"
-                        >
-                          {row.email}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          colSpan="2"
-                          style={{ "text-align": "center" }}
-                          align="right"
-                        >
-                          {row.date_entered}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    );
-                  })}
-              {emptyRows > 0 && (
-                <StyledTableRow>
-                  <StyledTableCell colSpan={6} />
-                </StyledTableRow>
+                          {row.phone_office}
+                        </span>
+                      </StyledTableCell>
+                      <StyledTableCell
+                        colSpan="2"
+                        style={{ textAlign: "center" }}
+                        align="right"
+                      >
+                        {row.assigned_user_name}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        colSpan="2"
+                        style={{ textAlign: "center" }}
+                        align="right"
+                      >
+                        {row.email}
+                      </StyledTableCell>
+                      <StyledTableCell
+                        colSpan="2"
+                        style={{ textAlign: "center" }}
+                        align="right"
+                      >
+                        {new Date(row.date_entered).toLocaleDateString()}
+                      </StyledTableCell> */}
+                    </StyledTableRow>
+                  );
+                }
               )}
             </TableBody>
           </Table>
@@ -333,8 +379,8 @@ export default function DataTable() {
             style={{ background: "#1965794a", display: "table", width: "100%" }}
           >
             <TablePagination
-              rowsPerPageOptions={20}
-              count={row.length}
+              rowsPerPageOptions={[20]}
+              count={totalAccounts.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}

@@ -1,8 +1,14 @@
 .data-table-box-container {
+  .css-levciy-MuiTablePagination-displayedRows {
+    margin-bottom: 0%;
+  }
   .MuiTableContainer-root {
     border-radius: 4px;
   }
   .table-data-head-container {
+    .css-levciy-MuiTablePagination-displayedRows {
+      margin-bottom: 0%;
+    }
     .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active {
       .MuiSvgIcon-root {
         color: white;
@@ -44,14 +50,15 @@
       -ms-flex-direction: row-reverse;
       flex-direction: row-reverse;
     }
-  
+
     .MuiCheckbox-root {
       color: #196579;
     }
     .MuiTableRow-root:hover {
       background: #196579;
       .MuiTableCell-root,
-      .MuiCheckbox-root ,  .data-link{
+      .MuiCheckbox-root,
+      .data-link {
         color: white;
       }
     }

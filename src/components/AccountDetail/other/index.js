@@ -20,7 +20,7 @@ export default function OtherInfo({ accountData }) {
             <div>Date Created:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.date_entered.value}</Item>
+            <Item>{accountData.attributes.date_entered}</Item>
           </Grid>
         </Grid>
         <Grid className="display-grid" item xs={8}>
@@ -28,7 +28,7 @@ export default function OtherInfo({ accountData }) {
             <div>Date Modified:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.date_modified.value}</Item>
+            <Item>{accountData.attributes.date_modified}</Item>
           </Grid>
         </Grid>
       </Grid>

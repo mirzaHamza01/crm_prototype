@@ -22,22 +22,22 @@ function EnhancedTableHead(props) {
     handleChangePage,
     handleChangeRowsPerPage,
     page,
+    totalAccounts,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
-
 
   return (
     <TableHead className="table-data-head-container">
       <StyledTableRow>
         {headCells.map((headCell) => (
           <StyledTableCell
-            colspan="2"
+            colSpan="2"
             style={
               headCell.id === "name"
                 ? { width: "255px" }
-                : { "text-align": "center", width: "255px" }
+                : { textAlign: "center", width: "255px" }
             }
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
@@ -82,8 +82,9 @@ function EnhancedTableHead(props) {
           )}
         </div>
         <TablePagination
-          rowsPerPageOptions={20}
-          count={rowCount}
+          rowsPerPageOptions={[20]}
+          count={totalAccounts.length}
+          className="mb-0"
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

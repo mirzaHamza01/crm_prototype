@@ -12,7 +12,6 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function MoreInfo({ accountData }) {
-  console.log(accountData);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2} columns={16} className="overview-grid">
@@ -21,7 +20,7 @@ export default function MoreInfo({ accountData }) {
             <div>Type:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.account_type.value}</Item>
+            <Item>{accountData.attributes.account_type}</Item>
           </Grid>
         </Grid>
         <Grid className="display-grid" item xs={8}>
@@ -29,7 +28,7 @@ export default function MoreInfo({ accountData }) {
             <div>Industry:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.industry.value}</Item>
+            <Item>{accountData.attributes.industry}</Item>
           </Grid>
         </Grid>
         <Grid item className="display-grid" xs={8}>
@@ -37,7 +36,7 @@ export default function MoreInfo({ accountData }) {
             <div>Annual Revenue:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.annual_revenue.value}</Item>
+            <Item>{accountData.attributes.annual_revenue}</Item>
           </Grid>
         </Grid>
         <Grid className="display-grid" item xs={8}>
@@ -45,7 +44,7 @@ export default function MoreInfo({ accountData }) {
             <div>Employees:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.employees.value}</Item>
+            <Item>{accountData.attributes.employees}</Item>
           </Grid>
         </Grid>
         <Grid item className="display-grid" xs={16}>
@@ -61,7 +60,7 @@ export default function MoreInfo({ accountData }) {
             <div>Campaign:</div>
           </Grid>
           <Grid xs={14}>
-            <Item>{accountData.name_value_list.campaign_name.value}</Item>
+            <Item>{accountData.attributes.campaign_name}</Item>
           </Grid>
         </Grid>
       </Grid>

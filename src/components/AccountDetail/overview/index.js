@@ -20,7 +20,7 @@ export default function Overview({ accountData }) {
             <div>Name:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.name.value}</Item>
+            <Item>{accountData.attributes.name}</Item>
           </Grid>
         </Grid>
         <Grid className="display-grid" item xs={8}>
@@ -28,7 +28,7 @@ export default function Overview({ accountData }) {
             <div>Office Phone:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.phone_office.value}</Item>
+            <Item>{accountData.attributes.phone_office}</Item>
           </Grid>
         </Grid>
         <Grid item className="display-grid" xs={8}>
@@ -36,7 +36,7 @@ export default function Overview({ accountData }) {
             <div>Website:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.website.value}</Item>
+            <Item>{accountData.attributes.website}</Item>
           </Grid>
         </Grid>
         <Grid className="display-grid" item xs={8}>
@@ -44,7 +44,7 @@ export default function Overview({ accountData }) {
             <div>Fax:</div>
           </Grid>
           <Grid xs={12}>
-            <Item>{accountData.name_value_list.phone_fax.value}</Item>
+            <Item>{accountData.attributes.phone_fax}</Item>
           </Grid>
         </Grid>
         <Grid item className="display-grid" xs={16}>
@@ -52,7 +52,7 @@ export default function Overview({ accountData }) {
             <div>Email Address:</div>
           </Grid>
           <Grid xs={14}>
-            <Item>{accountData.name_value_list.email.value}</Item>
+            <Item>{accountData.attributes.email}</Item>
           </Grid>
         </Grid>
         <Grid item className="display-grid" xs={8}>
@@ -62,14 +62,11 @@ export default function Overview({ accountData }) {
           <Grid xs={12}>
             <Item>
               {" "}
-              {
-                accountData.name_value_list.billing_address_street.value
-              } &nbsp; {accountData.name_value_list.billing_address_state.value}
+              {accountData.attributes.billing_address_street} &nbsp;{" "}
+              {accountData.attributes.billing_address_state}
               &nbsp;
-              {
-                accountData.name_value_list.billing_address_country.value
-              }&nbsp;{" "}
-              {accountData.name_value_list.billing_address_postalcode.value}
+              {accountData.attributes.billing_address_country}&nbsp;{" "}
+              {accountData.attributes.billing_address_postalcode}
             </Item>
           </Grid>
         </Grid>
@@ -79,12 +76,10 @@ export default function Overview({ accountData }) {
           </Grid>
           <Grid xs={12}>
             <Item>
-              {accountData.name_value_list.shipping_address_street.value} &nbsp;{" "}
-              {accountData.name_value_list.shipping_address_state.value}&nbsp;
-              {
-                accountData.name_value_list.shipping_address_country.value
-              }&nbsp;{" "}
-              {accountData.name_value_list.shipping_address_postalcode.value}
+              {accountData.attributes.shipping_address_street} &nbsp;{" "}
+              {accountData.attributes.shipping_address_state}&nbsp;
+              {accountData.attributes.shipping_address_country}&nbsp;{" "}
+              {accountData.attributes.shipping_address_postalcode}
             </Item>
           </Grid>
         </Grid>
@@ -93,7 +88,7 @@ export default function Overview({ accountData }) {
             <div>Description:</div>
           </Grid>
           <Grid xs={14}>
-            <Item>{accountData.name_value_list.description.value}</Item>
+            <Item>{accountData.attributes.description}</Item>
           </Grid>
         </Grid>
         <Grid item className="display-grid" xs={16}>
@@ -101,7 +96,7 @@ export default function Overview({ accountData }) {
             <div>Assigned to:</div>
           </Grid>
           <Grid xs={14}>
-            <Item>{accountData.name_value_list.assigned_user_name.value}</Item>
+            <Item>{accountData.attributes.assigned_user_name}</Item>
           </Grid>
         </Grid>
       </Grid>
