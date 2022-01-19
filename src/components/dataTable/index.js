@@ -16,7 +16,7 @@ import {
 } from "../../APi";
 import EnhancedTableHead from "./enchancedTableHead";
 import LoadingComponent from "../../loadingComponent";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import FilterAccounts from "./filterAccounts";
 
 const style = {
@@ -226,11 +226,12 @@ export default function DataTable() {
   };
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const navigate = useNavigate();
+  const history = useHistory();
 
   function handleNextPage(id, data, total) {
     const index = accountIds.findIndex((x) => x == id);
-    navigate(`Accounts/${id}`, {
+    history.push({
+      pathname: `Accounts/${id}`,
       state: {
         accountData: data,
         accountIds: accountIds,

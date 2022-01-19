@@ -1,12 +1,15 @@
 import React from "react";
 import AccountsData from "../components/AccountsData";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import AccountDetail from "../components/AccountDetail";
+import Login from "../components/Auth/login";
+import ProtectedRoute from "./privateRoute";
 export default function CustomRouter() {
   return (
-    <Routes>
-      <Route path="/" element={<AccountsData />} exact />
-      <Route path="/Accounts/:id" element={<AccountDetail />} />
-    </Routes>
+    <Switch>
+      <Route path="/login" exact component={Login} />
+      <ProtectedRoute exact path="/" component={AccountsData} />
+      <ProtectedRoute exact path="/Accounts/:id" component={AccountDetail} />
+    </Switch>
   );
 }

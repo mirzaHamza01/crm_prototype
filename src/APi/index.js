@@ -23,7 +23,7 @@ export async function restApiGetAccessToken() {
   const url = "http://localhost/suiteCrm/Api/access_token";
   const data = {
     grant_type: "client_credentials",
-    client_id: "44f207df-3341-fd53-0063-61e66343e8ab",
+    client_id: "b0f807d4-20af-8af7-eb3e-61e7a5ddba67",
     client_secret: "12345",
   };
   const response = await restApi(url, "post", data);
@@ -70,4 +70,16 @@ export async function restApiGetFilterAccount(token, name) {
   );
 
   return response2.data;
+}
+
+//login and resgister
+
+export async function restApiLoginUser(token , name) {
+  const response = await restApi(
+    `http://localhost/suiteCrm/Api/V8/module/Users?filter[user_name][eq]=${name}`,
+    "get",
+    token
+  );
+
+  return response.data;
 }

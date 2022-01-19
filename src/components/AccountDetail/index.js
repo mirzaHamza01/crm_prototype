@@ -5,7 +5,7 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Overview from "./overview";
-import { Router, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Router, useLocation, useHistory, useParams } from "react-router-dom";
 import MoreInfo from "./moreInfo";
 import OtherInfo from "./other";
 import { Button } from "@mui/material";
@@ -54,7 +54,7 @@ export default function AccountDetail(props) {
   const [curIndex, setCurIndex] = useState(accIndex);
   const [token, setToken] = useState(accessToken);
   const [currentAccData, setCurrentAccData] = React.useState(accountData);
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -68,8 +68,8 @@ export default function AccountDetail(props) {
     await restApiRequest(token, true, accountIds[count]).then((res) => {
       setCurrentAccData(res);
       setCurIndex(count);
-      navigate(`/Accounts/${accountIds[count]}`, {
-        replace: true,
+      history.replace({
+        pathname: `/Accounts/${accountIds[count]}`,
         state: {
           accountData: res,
           accountIds: accountIds,
@@ -87,8 +87,8 @@ export default function AccountDetail(props) {
     await restApiRequest(token, true, accountIds[count]).then((res) => {
       setCurrentAccData(res);
       setCurIndex(count);
-      navigate(`/Accounts/${accountIds[count]}`, {
-        replace: true,
+      history.replace({
+        pathname: `/Accounts/${accountIds[count]}`,
         state: {
           accountData: res,
           accountIds: accountIds,
