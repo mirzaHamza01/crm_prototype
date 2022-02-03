@@ -11,8 +11,9 @@ import OtherInfo from "./other";
 import { Button } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import { restApiRequest } from "../../APi";
+import { restApiRequest, restApiGetUserDocuments } from "../../APi";
 import LoadingComponent from "../../loadingComponent";
+import Documents from "./accountMoreOptions/documents";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -49,25 +50,34 @@ function a11yProps(index) {
 export default function AccountDetail(props) {
   const [value, setValue] = React.useState(0);
   const { state } = useLocation();
-  const { accountData, accIndex, totalIndex, accountIds, accessToken } = state;
+  const {
+    accountData,
+    accIndex,
+    totalIndex,
+    accountIds,
+    accessToken,
+    documentData,
+  } = state;
   const [load, setLoad] = React.useState(false);
   const [curIndex, setCurIndex] = useState(accIndex);
   const [token, setToken] = useState(accessToken);
   const [currentAccData, setCurrentAccData] = React.useState(accountData);
+  const [currentAccDocData, setCurrentAccDocData] =
+    React.useState(documentData);
   const history = useHistory();
-
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  // useEffect(() => {
-  //   setCurrentAccData(accountData[curIndex]);
-  // }, [curIndex]);
+
   async function handleIncrement() {
     setLoad(true);
     let count = curIndex + 1;
-    await restApiRequest(token, true, accountIds[count]).then((res) => {
+    await restApiRequest(token, true, accountIds[count]).then(async (res) => {
       setCurrentAccData(res);
       setCurIndex(count);
+      await restApiGetUserDocuments(token, accountIds[count]).then((doc) => {
+        setCurrentAccDocData(doc);
+      });
       history.replace({
         pathname: `/Accounts/${accountIds[count]}`,
         state: {
@@ -84,9 +94,12 @@ export default function AccountDetail(props) {
   async function handleDecrement() {
     setLoad(true);
     let count = curIndex - 1;
-    await restApiRequest(token, true, accountIds[count]).then((res) => {
+    await restApiRequest(token, true, accountIds[count]).then(async (res) => {
       setCurrentAccData(res);
       setCurIndex(count);
+      await restApiGetUserDocuments(token, accountIds[count]).then((doc) => {
+        setCurrentAccDocData(doc);
+      });
       history.replace({
         pathname: `/Accounts/${accountIds[count]}`,
         state: {
@@ -101,74 +114,77 @@ export default function AccountDetail(props) {
   }
   return (
     <div className="accounts-detail-container">
-      <Box sx={{ width: "80%", marginTop: "50px" }}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-          }}
-        >
-          <div className="accounts-detail-title">
-            {currentAccData.attributes.name}
-          </div>
-          <div className="accounts-detail-tabs">
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              aria-label="basic tabs example"
-            >
-              <Tab label="OVERVIEW" {...a11yProps(0)} />
-              <Tab label="MORE INFORMATION" {...a11yProps(1)} />
-              <Tab label="OTHER" {...a11yProps(2)} />
-            </Tabs>
-            <div className="change-account-detail">
-              <Button
-                variant="contained"
-                size="small"
-                onClick={handleDecrement}
-                disabled={curIndex + 1 === 1 || load}
-              >
-                <NavigateBeforeIcon /> Previous
-              </Button>
-              &nbsp; ({curIndex + 1} of {totalIndex})&nbsp;&nbsp;&nbsp;
-              <Button
-                variant="contained"
-                size="small"
-                onClick={handleIncrement}
-                disabled={curIndex + 1 === totalIndex || load}
-              >
-                Next <NavigateNextIcon />
-              </Button>
+      <div>
+        <Box sx={{ marginTop: "50px", marginBottom: "50px" }}>
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+            }}
+          >
+            <div className="accounts-detail-title">
+              {currentAccData.attributes.name}
             </div>
-          </div>
+            <div className="accounts-detail-tabs">
+              <Tabs
+                value={value}
+                onChange={handleChange}
+                aria-label="basic tabs example"
+              >
+                <Tab label="OVERVIEW" {...a11yProps(0)} />
+                <Tab label="MORE INFORMATION" {...a11yProps(1)} />
+                <Tab label="OTHER" {...a11yProps(2)} />
+              </Tabs>
+              <div className="change-account-detail">
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleDecrement}
+                  disabled={curIndex + 1 === 1 || load}
+                >
+                  <NavigateBeforeIcon /> Previous
+                </Button>
+                &nbsp; ({curIndex + 1} of {totalIndex})&nbsp;&nbsp;&nbsp;
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleIncrement}
+                  disabled={curIndex + 1 === totalIndex || load}
+                >
+                  Next <NavigateNextIcon />
+                </Button>
+              </div>
+            </div>
+          </Box>
+          <TabPanel
+            style={{ background: "white", borderRadius: "0px 0px 4px 4px" }}
+            value={value}
+            index={0}
+          >
+            <Overview accountData={currentAccData} />
+          </TabPanel>
+          <TabPanel
+            style={{ background: "white", borderRadius: "0px 0px 4px 4px" }}
+            value={value}
+            index={1}
+          >
+            <MoreInfo accountData={currentAccData} />
+          </TabPanel>
+          <TabPanel
+            style={{ background: "white", borderRadius: "0px 0px 4px 4px" }}
+            value={value}
+            index={2}
+          >
+            <OtherInfo accountData={currentAccData} />
+          </TabPanel>
         </Box>
-        <TabPanel
-          style={{ background: "white", borderRadius: "0px 0px 4px 4px" }}
-          value={value}
-          index={0}
-        >
-          <Overview accountData={currentAccData} />
-        </TabPanel>
-        <TabPanel
-          style={{ background: "white", borderRadius: "0px 0px 4px 4px" }}
-          value={value}
-          index={1}
-        >
-          <MoreInfo accountData={currentAccData} />
-        </TabPanel>
-        <TabPanel
-          style={{ background: "white", borderRadius: "0px 0px 4px 4px" }}
-          value={value}
-          index={2}
-        >
-          <OtherInfo accountData={currentAccData} />
-        </TabPanel>
+        <Documents token={token} DocumentsData={currentAccDocData} />
         {load && (
           <div className="mt-2">
             <LoadingComponent />
           </div>
         )}
-      </Box>
+      </div>
     </div>
   );
 }

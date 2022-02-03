@@ -1,0 +1,15 @@
+{
+  "SERVER_URL_ACCESS_TOKEN": "http://localhost/suiteCrm/Api/access_token",
+  "ACCESS_TOKEN_DATA": {
+    "GRANT_TYPE": "client_credentials",
+    "USER_ID": "def13415-80ad-4360-6128-61fba5ca4f63",
+    "USER_SECRET": "12345"
+  },
+  "MODULE": {
+    "MODULE_NAME": "Accounts",
+    "MODULE_NAME_FOR_API_ACCESS": "Account",
+    "SERVER_URL_MODULE_ACCESS": "http://localhost/suiteCrm/Api/V8/module"
+  },
+  "USER_MODULE_NAME": "Users",
+  "DOCUMENTS_MODULE_NAME": "Documents"
+}

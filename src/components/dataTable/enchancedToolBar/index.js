@@ -2,6 +2,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { IconButton } from "@mui/material";
+import configData from "../../../config.json";
 import { useHistory } from "react-router-dom";
 const EnhancedTableToolbar = (props) => {
   const history = useHistory();
@@ -17,7 +18,7 @@ const EnhancedTableToolbar = (props) => {
         id="tableTitle"
         component="div"
       >
-        ACCOUNTS
+        {configData.MODULE.MODULE_NAME}
       </Typography>
       <IconButton onClick={handleLogout} aria-label="logout" size="large">
         <LogoutIcon fontSize="inherit" />

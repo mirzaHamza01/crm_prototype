@@ -7,12 +7,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import configData from "../../config.json";
 import Checkbox from "@mui/material/Checkbox";
 import { styled } from "@mui/material/styles";
 import {
   restApiGetAccounts,
   restApiRequest,
   restApiGetAccessToken,
+  restApiGetUserDocuments,
 } from "../../APi";
 import EnhancedTableHead from "./enchancedTableHead";
 import LoadingComponent from "../../loadingComponent";
@@ -228,17 +230,20 @@ export default function DataTable() {
 
   const history = useHistory();
 
-  function handleNextPage(id, data, total) {
+  async function handleNextPage(id, data, total) {
     const index = accountIds.findIndex((x) => x == id);
-    history.push({
-      pathname: `Accounts/${id}`,
-      state: {
-        accountData: data,
-        accountIds: accountIds,
-        accIndex: index,
-        totalIndex: total,
-        accessToken: accessToken,
-      },
+    await restApiGetUserDocuments(accessToken, id).then((doc) => {
+      history.push({
+        pathname: `${configData.MODULE.MODULE_NAME}/${id}`,
+        state: {
+          accountData: data,
+          accountIds: accountIds,
+          accIndex: index,
+          totalIndex: total,
+          accessToken: accessToken,
+          documentData: doc,
+        },
+      });
     });
   }
   return load ? (

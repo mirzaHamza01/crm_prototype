@@ -1,4 +1,5 @@
 import axios from "axios";
+import configData from "../config.json";
 
 const restApi = async (url, axiosType, restData) => {
   try {
@@ -20,11 +21,11 @@ const restApi = async (url, axiosType, restData) => {
 };
 
 export async function restApiGetAccessToken() {
-  const url = "http://localhost/suiteCrm/Api/access_token";
+  const url = configData.SERVER_URL_ACCESS_TOKEN;
   const data = {
-    grant_type: "client_credentials",
-    client_id: "b0f807d4-20af-8af7-eb3e-61e7a5ddba67",
-    client_secret: "12345",
+    grant_type: configData.ACCESS_TOKEN_DATA.GRANT_TYPE,
+    client_id: configData.ACCESS_TOKEN_DATA.USER_ID,
+    client_secret: configData.ACCESS_TOKEN_DATA.USER_SECRET,
   };
   const response = await restApi(url, "post", data);
 
@@ -39,12 +40,12 @@ export async function restApiRequest(
 ) {
   const response2 = single
     ? await restApi(
-        `http://localhost/suiteCrm/Api/V8/module/Accounts/${id}`,
+        `${configData.MODULE.SERVER_URL_MODULE_ACCESS}/${configData.MODULE.MODULE_NAME}/${id}`,
         "get",
         token
       )
     : await restApi(
-        `http://localhost/suiteCrm/Api/V8/module/Accounts?sort=name&page[number]=${pageNo}&page[size]=3`,
+        `${configData.MODULE.SERVER_URL_MODULE_ACCESS}/${configData.MODULE.MODULE_NAME}?sort=name&page[number]=${pageNo}&page[size]=3`,
         "get",
         token
       );
@@ -54,7 +55,17 @@ export async function restApiRequest(
 
 export async function restApiGetAccounts(token) {
   const response2 = await restApi(
-    `http://localhost/suiteCrm/Api/V8/module/Accounts?fields[Account]=id&sort=name`,
+    `${configData.MODULE.SERVER_URL_MODULE_ACCESS}/${configData.MODULE.MODULE_NAME}?fields[${configData.MODULE.MODULE_NAME_FOR_API_ACCESS}]=id&sort=name`,
+    "get",
+    token
+  );
+
+  return response2.data;
+}
+
+export async function restApiGetUserDocuments(token, id) {
+  const response2 = await restApi(
+    `${configData.MODULE.SERVER_URL_MODULE_ACCESS}/${configData.MODULE.MODULE_NAME}/${id}/relationships/documents`,
     "get",
     token
   );
@@ -64,7 +75,7 @@ export async function restApiGetAccounts(token) {
 
 export async function restApiGetFilterAccount(token, name) {
   const response2 = await restApi(
-    `http://localhost/suiteCrm/Api/V8/module/Accounts?filter[operator]=and&filter[name][eq]=${name}`,
+    `${configData.MODULE.SERVER_URL_MODULE_ACCESS}/${configData.MODULE.MODULE_NAME}?filter[operator]=and&filter[name][eq]=${name}`,
     "get",
     token
   );
@@ -74,9 +85,9 @@ export async function restApiGetFilterAccount(token, name) {
 
 //login and resgister
 
-export async function restApiLoginUser(token , name) {
+export async function restApiLoginUser(token, name) {
   const response = await restApi(
-    `http://localhost/suiteCrm/Api/V8/module/Users?filter[user_name][eq]=${name}`,
+    `${configData.MODULE.SERVER_URL_MODULE_ACCESS}/${configData.USER_MODULE_NAME}?filter[user_name][eq]=${name}`,
     "get",
     token
   );

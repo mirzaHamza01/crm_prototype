@@ -33,7 +33,6 @@ export default function Login() {
     msg: "",
   });
 
-  const dispatch = useDispatch();
   function onChange(e) {
     e.target.id === "name"
       ? setName(e.target.value)
@@ -50,9 +49,8 @@ export default function Login() {
       setLoad(true);
       try {
         await restApiGetAccessToken().then(async (res) => {
-          await restApiLoginUser(res, name).then(async (res) => {
-            console.log(res);
-            if (res.length === 0) {
+          await restApiLoginUser(res, name).then(async (res2) => {
+            if (res2.length === 0) {
               setOpen(true);
               setSnack({
                 check: true,
@@ -60,13 +58,15 @@ export default function Login() {
                 msg: "User with this name is not exit",
               });
             } else {
-              // var encrypted = CryptoJS.AES.encrypt(password, name);
+              var encrypted = CryptoJS.AES.encrypt(password, name);
+              console.log(encrypted.toString());
               var decrypted = CryptoJS.AES.decrypt(
-                res[0].attributes.portal_password_c,
+                res2[0].attributes.portal_password_c,
                 name
               );
               var plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-              if (password == plaintext) {
+              console.log({ plaintext });
+              if (password === plaintext) {
                 setName("");
                 setPassword("");
                 // dispatch(userLoginAction(true));

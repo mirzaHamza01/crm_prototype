@@ -75,3 +75,30 @@
     align-items: flex-end;
   }
 }
+
+.account-detail-documents {
+  .css-1elwnq4-MuiPaper-root-MuiAccordion-root {
+    background: #66727d !important;
+  }
+  .css-15v22id-MuiAccordionDetails-root {
+    background: #ececec !important;
+    padding: 0%;
+  }
+  .account-detail-documents-table {
+    .css-11xur9t-MuiPaper-root-MuiTableContainer-root {
+      border-radius: 0%;
+    }
+    .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root:hover {
+      color: white;
+    }
+    .css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root.Mui-active {
+      color: white;
+      .MuiTableSortLabel-icon {
+        color: white;
+      }
+    }
+  }
+  .css-levciy-MuiTablePagination-displayedRows {
+    margin-bottom: 0%;
+  }
+}
