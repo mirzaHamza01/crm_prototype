@@ -11,9 +11,17 @@ import OtherInfo from "./other";
 import { Button } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import { restApiRequest, restApiGetUserDocuments } from "../../APi";
+import {
+  restApiRequest,
+  restApiGetUserDocuments,
+  restApiGetAccessToken,
+} from "../../APi";
 import LoadingComponent from "../../loadingComponent";
+import Grid from "@mui/material/Grid";
+
 import Documents from "./accountMoreOptions/documents";
+import { useDispatch, useSelector } from "react-redux";
+import { saveDocData, saveToken } from "../../redux/action/userAction";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -50,25 +58,29 @@ function a11yProps(index) {
 export default function AccountDetail(props) {
   const [value, setValue] = React.useState(0);
   const { state } = useLocation();
-  const {
-    accountData,
-    accIndex,
-    totalIndex,
-    accountIds,
-    accessToken,
-    documentData,
-  } = state;
+  const { accountData, accIndex, totalIndex, accountIds, accessToken } = state;
   const [load, setLoad] = React.useState(false);
+  const dispatch = useDispatch();
   const [curIndex, setCurIndex] = useState(accIndex);
-  const [token, setToken] = useState(accessToken);
+  const token = useSelector((state) => state.accounts.token);
   const [currentAccData, setCurrentAccData] = React.useState(accountData);
-  const [currentAccDocData, setCurrentAccDocData] =
-    React.useState(documentData);
+  const [page, setPage] = React.useState(0);
   const history = useHistory();
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  async function handleDocData() {
+    await restApiGetAccessToken().then(async (token) => {
+      dispatch(saveToken(token));
+      await restApiGetUserDocuments(token, accountIds[curIndex]).then((doc) => {
+        dispatch(saveDocData(doc));
+      });
+    });
+  }
+  useEffect(() => {
+    handleDocData();
+  }, []);
   async function handleIncrement() {
     setLoad(true);
     let count = curIndex + 1;
@@ -76,8 +88,9 @@ export default function AccountDetail(props) {
       setCurrentAccData(res);
       setCurIndex(count);
       await restApiGetUserDocuments(token, accountIds[count]).then((doc) => {
-        setCurrentAccDocData(doc);
+        dispatch(saveDocData(doc));
       });
+      setPage(0);
       history.replace({
         pathname: `/Accounts/${accountIds[count]}`,
         state: {
@@ -98,8 +111,9 @@ export default function AccountDetail(props) {
       setCurrentAccData(res);
       setCurIndex(count);
       await restApiGetUserDocuments(token, accountIds[count]).then((doc) => {
-        setCurrentAccDocData(doc);
+        dispatch(saveDocData(doc));
       });
+      setPage(0);
       history.replace({
         pathname: `/Accounts/${accountIds[count]}`,
         state: {
@@ -114,7 +128,7 @@ export default function AccountDetail(props) {
   }
   return (
     <div className="accounts-detail-container">
-      <div>
+      <div style={{ width: "80%" }}>
         <Box sx={{ marginTop: "50px", marginBottom: "50px" }}>
           <Box
             sx={{
@@ -126,34 +140,42 @@ export default function AccountDetail(props) {
               {currentAccData.attributes.name}
             </div>
             <div className="accounts-detail-tabs">
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-              >
-                <Tab label="OVERVIEW" {...a11yProps(0)} />
-                <Tab label="MORE INFORMATION" {...a11yProps(1)} />
-                <Tab label="OTHER" {...a11yProps(2)} />
-              </Tabs>
-              <div className="change-account-detail">
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleDecrement}
-                  disabled={curIndex + 1 === 1 || load}
-                >
-                  <NavigateBeforeIcon /> Previous
-                </Button>
-                &nbsp; ({curIndex + 1} of {totalIndex})&nbsp;&nbsp;&nbsp;
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleIncrement}
-                  disabled={curIndex + 1 === totalIndex || load}
-                >
-                  Next <NavigateNextIcon />
-                </Button>
-              </div>
+              <Grid container className="accounts-detail-tabs">
+                <Grid>
+                  {" "}
+                  <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="basic tabs example"
+                  >
+                    <Tab label="OVERVIEW" {...a11yProps(0)} />
+                    <Tab label="MORE INFORMATION" {...a11yProps(1)} />
+                    <Tab label="OTHER" {...a11yProps(2)} />
+                  </Tabs>
+                </Grid>
+                <Grid>
+                  {" "}
+                  <div className="change-account-detail">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleDecrement}
+                      disabled={curIndex + 1 === 1 || load}
+                    >
+                      <NavigateBeforeIcon /> Previous
+                    </Button>
+                    &nbsp; ({curIndex + 1} of {totalIndex})&nbsp;&nbsp;&nbsp;
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleIncrement}
+                      disabled={curIndex + 1 === totalIndex || load}
+                    >
+                      Next <NavigateNextIcon />
+                    </Button>
+                  </div>
+                </Grid>
+              </Grid>{" "}
             </div>
           </Box>
           <TabPanel
@@ -178,7 +200,12 @@ export default function AccountDetail(props) {
             <OtherInfo accountData={currentAccData} />
           </TabPanel>
         </Box>
-        <Documents token={token} DocumentsData={currentAccDocData} />
+        <Documents
+          id={accountIds[curIndex]}
+          setCurrentAccData={setCurrentAccData}
+          setPage={setPage}
+          page={page}
+        />
         {load && (
           <div className="mt-2">
             <LoadingComponent />

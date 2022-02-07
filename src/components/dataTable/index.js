@@ -20,18 +20,8 @@ import EnhancedTableHead from "./enchancedTableHead";
 import LoadingComponent from "../../loadingComponent";
 import { useHistory } from "react-router-dom";
 import FilterAccounts from "./filterAccounts";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
+import { useDispatch } from "react-redux";
+import { saveDocData, saveToken } from "../../redux/action/userAction";
 
 export default function DataTable() {
   const [order, setOrder] = React.useState("asc");
@@ -48,7 +38,7 @@ export default function DataTable() {
   const [isFilter, setIsFilter] = useState(false);
   const handleOpen = () => setOpen(true);
   const [accessToken, setAccessToken] = useState("");
-
+  const dispatch = useDispatch();
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: "#196579",
@@ -100,6 +90,7 @@ export default function DataTable() {
     setLoad(true);
     restApiGetAccessToken().then((token) => {
       setAccessToken(token);
+      dispatch(saveToken(token));
       restApiGetAccounts(token).then((res) => {
         setTotalAccounts(res);
       });
@@ -233,6 +224,7 @@ export default function DataTable() {
   async function handleNextPage(id, data, total) {
     const index = accountIds.findIndex((x) => x == id);
     await restApiGetUserDocuments(accessToken, id).then((doc) => {
+      dispatch(saveDocData(doc));
       history.push({
         pathname: `${configData.MODULE.MODULE_NAME}/${id}`,
         state: {
@@ -294,6 +286,7 @@ export default function DataTable() {
                       {Object.entries(row).map((val, i) => {
                         return (
                           <StyledTableCell
+                            key={val}
                             style={
                               val[0] === "name"
                                 ? { whiteSpace: "nowrap" }

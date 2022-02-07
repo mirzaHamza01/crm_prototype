@@ -1,15 +1,21 @@
-import { USER_LOGIN } from "../constant";
+import { ACCOUNT_DOC, SAVE_TOKEN } from "../constant";
 
 let initialState = {
-  login: false,
+  docData: [],
+  token: "",
 };
 
 export const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case USER_LOGIN:
+    case ACCOUNT_DOC:
       return {
         ...state,
-        login: action.payload,
+        docData: action.payload,
+      };
+    case SAVE_TOKEN:
+      return {
+        ...state,
+        token: action.payload,
       };
 
     default:

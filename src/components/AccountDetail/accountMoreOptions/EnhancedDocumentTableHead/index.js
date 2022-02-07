@@ -16,6 +16,7 @@ function EnhancedDocumentTableHead(props) {
     handleChangeRowsPerPage,
     page,
     rows,
+    handleClickOpen,
   } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -50,12 +51,16 @@ function EnhancedDocumentTableHead(props) {
       </StyledTableRow>
       <StyledTableRow style={{ background: "rgb(102 114 125 / 29%)" }}>
         <div className="p-2">
-          <Button style={{ background: "#66727db8" }} variant="contained">
+          <Button
+            style={{ background: "#66727db8" }}
+            variant="contained"
+            onClick={handleClickOpen}
+          >
             Create
           </Button>
         </div>
         <TablePagination
-          rowsPerPageOptions={[20]}
+          rowsPerPageOptions={[3]}
           count={rows.length}
           className="mb-0"
           rowsPerPage={rowsPerPage}

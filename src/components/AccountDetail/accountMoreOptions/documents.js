@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -11,9 +11,17 @@ import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
+import configData from "../../../config.json";
 import Paper from "@mui/material/Paper";
-import { restApiGetAccessToken, restApiGetAccounts } from "../../../APi";
+import {
+  restApiGetAccessToken,
+  restApiGetAccounts,
+  restApiGetUserDocuments,
+} from "../../../APi";
 import EnhancedDocumentTableHead from "./EnhancedDocumentTableHead";
+import CreateDialog from "./createDialog";
+import axios from "axios";
+import { useSelector } from "react-redux";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#66727db8",
@@ -67,17 +75,18 @@ const headCells = [
   },
 ];
 
-export default function Documents({ token, DocumentsData }) {
+export default function Documents({ id, setCurrentAccData, page, setPage }) {
   const [orderBy, setOrderBy] = React.useState("");
   const [expandAccor, setExpand] = useState(false);
+  const token = useSelector((state) => state.accounts.token);
   const [order, setOrder] = React.useState("asc");
+  const docData = useSelector((state) => state.accounts.docData);
   const [totalAccounts, setTotalAccounts] = useState([]);
-  const [rowsPerPage, setRowsPerPage] = React.useState(20);
-  const [page, setPage] = React.useState(0);
-  console.log(DocumentsData);
+  const [rowsPerPage, setRowsPerPage] = React.useState(3);
   const handleChangePage = async (event, newPage) => {
     setPage(newPage);
   };
+
   React.useEffect(() => {
     restApiGetAccessToken().then((token) => {
       restApiGetAccounts(token).then((res) => {
@@ -122,9 +131,10 @@ export default function Documents({ token, DocumentsData }) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  const sliceData = docData.slice(page * 3, (page + 1) * 3);
   const row =
-    DocumentsData &&
-    DocumentsData.map((acc, i) => {
+    docData &&
+    sliceData.map((acc, i) => {
       let objCell = {};
       headCells.map((cell, c) => {
         Object.keys(acc.attributes).forEach((k, j) => {
@@ -136,6 +146,11 @@ export default function Documents({ token, DocumentsData }) {
   function handleClose() {
     setExpand(!expandAccor);
   }
+  const [open, setOpen] = useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
   return (
     <div className="account-detail-documents">
       <Accordion expanded={expandAccor}>
@@ -155,12 +170,13 @@ export default function Documents({ token, DocumentsData }) {
               <EnhancedDocumentTableHead
                 numSelected={null}
                 order={order}
+                handleClickOpen={handleClickOpen}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={DocumentsData && DocumentsData.length}
+                rowCount={docData && docData.length}
                 StyledTableRow={StyledTableRow}
                 StyledTableCell={StyledTableCell}
-                rows={DocumentsData && row}
+                rows={docData && docData}
                 totalAccounts={totalAccounts}
                 rowsPerPage={rowsPerPage}
                 page={page}
@@ -176,21 +192,41 @@ export default function Documents({ token, DocumentsData }) {
                       <StyledTableRow hover tabIndex={-1} key={index}>
                         {Object.entries(row).map((val, i) => {
                           return (
-                            <StyledTableCell
-                              style={{
-                                textAlign: "center",
-                              }}
-                              component="th"
-                              id={labelId}
-                              colSpan="2"
-                              scope="row"
-                            >
-                              <span>
-                                {val[0] === "active_date"
-                                  ? new Date(val[1]).toLocaleDateString()
-                                  : val[1]}
-                              </span>
-                            </StyledTableCell>
+                            val[0] !== "id" && (
+                              <StyledTableCell
+                                style={{
+                                  textAlign: "center",
+                                }}
+                                component="th"
+                                id={labelId}
+                                colSpan="2"
+                                scope="row"
+                              >
+                                <span>
+                                  {val[0] === "active_date" ? (
+                                    new Date(val[1]).toLocaleDateString()
+                                  ) : val[0] === "filename" ? (
+                                    <a
+                                      style={{
+                                        color: "rgba(0, 0, 0, 0.87)",
+                                        textDecoration: "none",
+                                      }}
+                                      href={`${
+                                        configData.SIDE_URL
+                                      }?entryPoint=download&id=${
+                                        docData[index + page * 3]?.id
+                                      }&type=Documents`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      {val[1]}
+                                    </a>
+                                  ) : (
+                                    val[1]
+                                  )}
+                                </span>
+                              </StyledTableCell>
+                            )
                           );
                         })}
                       </StyledTableRow>
@@ -209,6 +245,12 @@ export default function Documents({ token, DocumentsData }) {
           </TableContainer>
         </AccordionDetails>
       </Accordion>
+      <CreateDialog
+        open={open}
+        accountId={id}
+        token={token}
+        setOpen={setOpen}
+      />
     </div>
   );
 }
