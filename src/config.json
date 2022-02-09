@@ -17,6 +17,7 @@
   "MAIL_DATA": {
     "SERVICE_ID": "service_k6ygeps",
     "TEMP_ID": "template_vegm6zq",
-    "FROM_NAME": "suiteCrm Portal"
+    "FROM_NAME": "suiteCrm Portal",
+    "MESSAGE": "Verification code is only available for 5 mints.\n"
   }
 }

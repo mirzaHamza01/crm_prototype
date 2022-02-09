@@ -32,8 +32,46 @@ enable email verification using emailJs
 
 setup steps
 
-# 1- Click on the link and create a free account on EmailJs (https://dashboard.emailjs.com/sign-up)
+# Creating EmailJs account
 
-# 2- After creating Select the service you want to start with from admin
+1- Click on the link and create a free account on EmailJs (https://dashboard.emailjs.com/sign-up)
+
+2- After creating Select the service you want to start with from dashboard
 
 <img src="readMePics/selectService.png">
+
+select the service you want to use. This mail is use as From send By to receiver.
+
+3- When you select service you see service_id copy this id and replace it in /src/config.json file with SERVICE_ID in MAIL_DATA object
+
+<img src="readMePics/service_id.png">
+
+# Creating mail template
+
+1- In your EmailJs dashboard click on Email Templates -> Create New template. Setup your template name and id.
+
+<img src="readMePics/temp.png">
+
+2- You can use curly braces for the fields that will receive data from react code as shown below. I have made "To email" field dynamic.
+
+3- You can configure the template as per your requirement. Please follow as it is in bellow pic.
+
+<img src="readMePics/temp_inside.png">
+
+4- After creating template copy the temp_id and replace it in /src/config.json file with TEMP_ID in MAIL_DATA object
+
+<img src="readMePics/temp_id.png">
+
+5- you can also change the body of mail by replacing MESSAGE in MAIL_DATA object /src/config.json file with
+
+# setup in React
+
+1- find the user id from EmailJs dashboard click on Integration. you can see user id in API KEYS in the end
+
+<img src="readMePics/user_id.png">
+
+2 - replace the copied user id from EmailJs to /public/index.html in react. In index.html file replace it in Script tag. you can see in pic below.
+
+<img src="readMePics/script.png">
+
+# Installation complate. READY TO GO

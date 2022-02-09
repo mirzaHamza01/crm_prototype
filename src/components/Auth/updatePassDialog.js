@@ -119,7 +119,7 @@ export default function UpdatePassDialog({
             const variables = {
               from_name: configData.MAIL_DATA.FROM_NAME,
               to_name: userName,
-              message: `your verification code is ${code}. It will be only available for 5 mints`,
+              message: `${configData.MAIL_DATA.MESSAGE} ${code}`,
               reply_to: res2[0].attributes.email1,
             };
             window.emailjs
