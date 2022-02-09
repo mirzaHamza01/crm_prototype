@@ -112,6 +112,15 @@ export default function UpdatePassDialog({
               type: "error",
               msg: "User with this name is not exit",
             });
+            setLoad(false);
+          } else if (!res2[0].attributes.email1) {
+            setSnackOpen(true);
+            setSnack({
+              check: true,
+              type: "error",
+              msg: "Email is not exit",
+            });
+            setLoad(false);
           } else {
             setUserId(res2[0].id);
             const serciveId = configData.MAIL_DATA.SERVICE_ID;
@@ -142,6 +151,7 @@ export default function UpdatePassDialog({
                   type: "error",
                   msg: "Error occur while send code to your mail",
                 });
+                setLoad(false);
               });
           }
         });
