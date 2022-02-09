@@ -27,3 +27,12 @@
 # during creating new user in step 2 you can set user_secret
 
 # after set user_secret replace it with USER_SECRET in config file
+
+# enable email verification using emailJs
+
+# setup steps
+
+1- Click on the link and create a free account on EmailJs (https://dashboard.emailjs.com/sign-up)
+
+2- After creating Select the service you want to start with from admin
+![selectService](file:///home/mirza.hamza/Pictures/selectService.png)

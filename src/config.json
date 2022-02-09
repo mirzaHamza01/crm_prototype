@@ -12,5 +12,11 @@
     "SERVER_URL_MODULE_ACCESS": "/Api/V8/module"
   },
   "USER_MODULE_NAME": "Users",
-  "DOCUMENTS_MODULE_NAME": "Documents"
+  "DOCUMENTS_MODULE_NAME": "Documents",
+
+  "MAIL_DATA": {
+    "SERVICE_ID": "service_k6ygeps",
+    "TEMP_ID": "template_vegm6zq",
+    "FROM_NAME": "suiteCrm Portal"
+  }
 }

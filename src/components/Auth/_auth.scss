@@ -1,0 +1,29 @@
+.sign-up-container {
+  .status-select {
+    .css-18e87ge-MuiFormControl-root {
+      margin: 0;
+    }
+    .css-1d3z3hw-MuiOutlinedInput-notchedOutline {
+      border: unset;
+    }
+  }
+}
+.customized-update-dialog-title {
+  .css-mhc70k-MuiGrid-root {
+    display: flex;
+    justify-content: center;
+  }
+  .css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+    min-width: 40%;
+  }
+}
+
+.customized-verify-dialog-title {
+  .overview-grid {
+    display: flex;
+    justify-content: center;
+  }
+  .css-1t1j96h-MuiPaper-root-MuiDialog-paper {
+    min-width: 50%;
+  }
+}

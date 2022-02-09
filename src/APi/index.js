@@ -174,3 +174,78 @@ export async function restApiLoginUser(token, name) {
 
   return response.data;
 }
+
+export async function restApiCreateNewUser(
+  user_name,
+  firstName,
+  lastName,
+  portalPass,
+  status,
+  mail,
+  token
+) {
+  let url = `${configData.SIDE_URL}${configData.MODULE.SERVER_URL_MODULE_ACCESS}`;
+
+  const docData = {
+    data: {
+      type: "User",
+      attributes: {
+        user_name: `${user_name}`,
+        first_name: `${firstName}`,
+        last_name: `${lastName}`,
+        full_name: `${firstName} ${lastName}`,
+        name: `${firstName} ${lastName}`,
+        portal_password_c: `${portalPass}`,
+        status: `${status}`,
+        email1: mail,
+        user_hash: `${portalPass}`,
+      },
+    },
+  };
+
+  let response = await axios({
+    method: `post`,
+    url: `${url}`,
+    data: docData,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-type": "application/vnd.api+json",
+      Accept: "application/vnd.api+json",
+      Authorization: "Bearer " + `${token}`,
+    },
+  });
+
+  console.log({ response });
+  return response;
+}
+
+export async function restApiUpdateUserPassword(userId, portalPass, token) {
+  let url = `${configData.SIDE_URL}${configData.MODULE.SERVER_URL_MODULE_ACCESS}`;
+
+  console.log(url);
+  const docData = {
+    data: {
+      type: "Users",
+      id: `${userId}`,
+      attributes: {
+        portal_password_c: `${portalPass}`,
+        user_hash: `${portalPass}`,
+      },
+    },
+  };
+
+  let response = await axios({
+    method: `patch`,
+    url: `${url}`,
+    data: docData,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-type": "application/vnd.api+json",
+      Accept: "application/vnd.api+json",
+      Authorization: "Bearer " + `${token}`,
+    },
+  });
+
+  console.log({ response });
+  return response;
+}

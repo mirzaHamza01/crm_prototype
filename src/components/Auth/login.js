@@ -17,8 +17,9 @@ import Snackbars from "../../snackBar";
 import { restApiGetAccessToken, restApiLoginUser } from "../../APi";
 import { useHistory } from "react-router-dom";
 import LoadingComponent from "../../loadingComponent";
-import { userLoginAction } from "../../redux/action/userAction";
+import UpdatePassDialog from "./updatePassDialog";
 import { useDispatch } from "react-redux";
+import { saveToken } from "../../redux/action/userAction";
 // SALT should be created ONE TIME upon sign up
 const theme = createTheme();
 
@@ -26,6 +27,16 @@ export default function Login() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [open, setOpen] = useState(true);
+  const [codeVerify, setCodeVerify] = React.useState(
+    localStorage.getItem("codeVerify") === "false" ? false : true
+  );
+  const [updatePassOpen, setUpdatePassOpen] = useState(
+    codeVerify
+      ? localStorage.getItem("updateDialogPass") === "false"
+        ? false
+        : true
+      : false
+  );
   const [load, setLoad] = useState(false);
   const [snack, setSnack] = useState({
     check: false,
@@ -39,6 +50,7 @@ export default function Login() {
       : setPassword(e.target.value);
   }
   const history = useHistory();
+  const dispatch = useDispatch();
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log(name, password);
@@ -49,7 +61,9 @@ export default function Login() {
       setLoad(true);
       try {
         await restApiGetAccessToken().then(async (res) => {
+          dispatch(saveToken(res));
           await restApiLoginUser(res, name).then(async (res2) => {
+            console.log(res);
             if (res2.length === 0) {
               setOpen(true);
               setSnack({
@@ -124,6 +138,7 @@ export default function Login() {
               required
               fullWidth
               id="name"
+              setUpdatePassOpen
               value={name}
               label="User Name"
               onChange={onChange}
@@ -158,12 +173,20 @@ export default function Login() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Button
+                  className="mt-0 pt-0"
+                  color="primary"
+                  onClick={() => {
+                    localStorage.setItem("updateDialogPass", true);
+                    setUpdatePassOpen(true);
+                  }}
+                  s
+                >
                   Forgot password?
-                </Link>
+                </Button>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/signup" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
@@ -176,6 +199,16 @@ export default function Login() {
             <LoadingComponent />
           </div>
         )}
+        <UpdatePassDialog
+          setSnack={setSnack}
+          setSnackOpen={setOpen}
+          setOpen={setUpdatePassOpen}
+          setCodeVerify={setCodeVerify}
+          codeVerify={codeVerify}
+          open={
+            localStorage.getItem("updateDialogPass") === "false" ? false : true
+          }
+        />
       </Container>
       {snack.check && (
         <Snackbars
