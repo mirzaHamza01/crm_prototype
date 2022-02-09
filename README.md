@@ -36,4 +36,4 @@ setup steps
 
 # 2- After creating Select the service you want to start with from admin
 
-![selectService](file:///home/mirza.hamza/Pictures/selectService.png)
+<img src="readMePics/selectService.png">
