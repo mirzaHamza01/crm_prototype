@@ -32,6 +32,14 @@ enable email verification using emailJs
 
 setup steps
 
+# //
+
+# Please Note. you can only use 200 per month mail request from EmailJs account
+
+(https://www.emailjs.com/pricing/)
+
+# //
+
 # Creating EmailJs account
 
 1- Click on the link and create a free account on EmailJs (https://dashboard.emailjs.com/sign-up)
@@ -62,7 +70,7 @@ select the service you want to use. This mail is use as From send By to receiver
 
 <img src="readMePics/temp_id.png">
 
-5- you can also change the body of mail by replacing MESSAGE in MAIL_DATA object /src/config.json file with
+5- you can also change the body of mail by replacing MESSAGE in MAIL_DATA object in /src/config.json file
 
 # setup in React
 
@@ -74,4 +82,4 @@ select the service you want to use. This mail is use as From send By to receiver
 
 <img src="readMePics/script.png">
 
-# Installation complate. READY TO GO
+# Installation complete. READY TO GO
